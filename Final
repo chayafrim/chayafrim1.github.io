@@ -1,0 +1,220 @@
+
+setwd('c:/Users/mushk/')
+#load in data
+data <- read.csv("C:/Users/mushk/Downloads/auto-mpg.csv")
+#replace the NAs with mean in horsepower
+> data$horsepower  <- as.numeric(data$horsepower)
+Warning message:
+NAs introduced by coercion 
+> meanhp <- mean(data$horsepower, na.rm = TRUE)
+> data$horsepower[is.na(data$horsepower)] <- meanhp
+#extract subset
+> datasubset <- data[1:300, ]
+#simple linear regression model with weight as independatn model and mpg as dependant
+> model <- lm(mpg ~ weight, data = datasubset)
+> summary(model)
+
+Call:
+lm(formula = mpg ~ weight, data = datasubset)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-9.1077 -1.8842 -0.0333  1.7275 15.1232 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 40.3879027  0.6368804   63.41   <2e-16 ***
+weight      -0.0062524  0.0001957  -31.96   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.992 on 298 degrees of freedom
+Multiple R-squared:  0.7741,	Adjusted R-squared:  0.7733 
+F-statistic:  1021 on 1 and 298 DF,  p-value: < 2.2e-16
+
+#plot the model
+> plot(datasubset$weight, datasubset$mpg, main = "Linear Regression", xlab = "Weight", ylab = "MPG")
+> abline(model, col = "blue")
+
+#multiple linear regression model
+> model <- lm(mpg ~ weight + displacement + horsepower + acceleration +cylinder, data = datasubset)
+> summary(model)
+
+Call:
+lm(formula = mpg ~ weight + displacement + horsepower + acceleration + 
+    cylinder, data = datasubset)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-9.2110 -1.8240 -0.0143  1.5865 15.0131 
+
+Coefficients:
+               Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  41.2004458  2.2087423  18.653  < 2e-16 ***
+weight       -0.0045050  0.0006076  -7.415 1.31e-12 ***
+displacement -0.0028229  0.0068976  -0.409   0.6826    
+horsepower   -0.0273439  0.0122362  -2.235   0.0262 *  
+acceleration -0.0728301  0.1032406  -0.705   0.4811    
+cylinder     -0.2596901  0.3272648  -0.794   0.4281    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.948 on 294 degrees of freedom
+Multiple R-squared:  0.7837,	Adjusted R-squared:   0.78 
+F-statistic:   213 on 5 and 294 DF,  p-value: < 2.2e-16
+
+#new multiple linear regression model with only significant independant models
+> model2 <- lm(mpg ~ weight + horsepower, data = datasubset)
+> summary(model2)
+
+Call:
+lm(formula = mpg ~ weight + horsepower, data = datasubset)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-8.6395 -1.7861 -0.0009  1.6724 14.6069 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 40.1131995  0.6324432  63.426  < 2e-16 ***
+weight      -0.0052032  0.0003748 -13.882  < 2e-16 ***
+horsepower  -0.0269131  0.0082479  -3.263  0.00123 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.945 on 297 degrees of freedom
+Multiple R-squared:  0.7819,	Adjusted R-squared:  0.7805 
+F-statistic: 532.4 on 2 and 297 DF,  p-value: < 2.2e-16
+
+#get remaining data to predictions
+> testdata <- data[301:398, ]
+> prediction <- predict(model2, newdata = testdata)
+> actualmpg <- testdata$mpg
+> residuals <- actualmpg-prediction
+
+#plot predictions and residuals
+> plot(prediction, residuals, main = "Residuals Plot", xlab = "Prediction mog", ylab = "Residuals")
+> hist(residuals, main = "Histogram of Residuals", xlab = "Residuals", breaks = 20, col = "lightblue", border = "black")
+ 
+
+#loading in the data
+> data = read.csv("C:/Users/mushk/Downloads/Call_Center.csv")
+#the column names
+> colnames(data)
+ [1] "Id"                       "Call.Timestamp"          
+ [3] "Call.Centres.City"        "Channel"                 
+ [5] "City"                     "Customer.Name"           
+ [7] "Reason"                   "Response.Time"           
+ [9] "Sentiment"                "State"                   
+[11] "Call.Duration.In.Minutes" "Csat.Score"    
+#Remove the rows that have NA as the Csat.Score
+> data <- data[!is.na(data$Csat.Score), ]
+
+#Simple Linear Regression model with Call.Duration.In.Minutes as the independant model and Csat.Score as the independant model
+> model  <- lm(Call.Duration.In.Minutes ~ Csat.Score, data = data)
+>
+(list "base" '(("object" . "") ("..." . "") ("digits" . "") ("quantile.type" . "7")) '("object" "intercept" "split" "expand.split" "keep.zero.df" "all" "full" "maxsum" "digits" "quantile.type" "dispersion" "correlation" "symbolic.cor" "test" "tol" "ny" "names" "loadings" "cutoff" "useSource" "..."))
+> model <- lm(Call.Duration.In.Minutes ~ Csat.Score, data = data)
+> summary(model)
+
+Call:
+lm(formula = Call.Duration.In.Minutes ~ Csat.Score, data = data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-20.4056 -10.1568  -0.0573   9.9427  20.0422 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 25.45538    0.27178  93.662   <2e-16 ***
+Csat.Score  -0.04976    0.04504  -1.105    0.269    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 11.83 on 12269 degrees of freedom
+Multiple R-squared:  9.947e-05,	Adjusted R-squared:  1.797e-05 
+F-statistic:  1.22 on 1 and 12269 DF,  p-value: 0.2693
+
+#bar plot to demonstrate
+> avg_csat <- aggregate(Csat.Score ~ Call.Duration.In.Minutes, data = data, FUN = mean)
+> barplot(avg_csat$Csat.Score,
+        names.arg = avg_csat$Call.Duration.In.Minutes,
+        xlab = "Call Duration (Minutes)",
+        ylab = "Average Csat Score",
+        main = "Average Csat Score by Call Duration",
+        col = "lightblue", border = "black", las = 2)
+
+#anova model with Sentiment as independant model and Csat as dependant variable
+
+> anova <- aov(Csat.Score ~ Sentiment, data = data)
+> summary(anova)
+               Df Sum Sq Mean Sq F value Pr(>F)    
+Sentiment       4  55624   13906   12770 <2e-16 ***
+Residuals   12266  13357       1                   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+#tukey test
+> TukeyHSD(anova)
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = Csat.Score ~ Sentiment, data = data)
+
+$Sentiment
+                                 diff       lwr       upr p adj
+Neutral-Negative             1.944908  1.878082  2.011734     0
+Positive-Negative            3.465166  3.379057  3.551276     0
+Very Negative-Negative      -2.070750 -2.145205 -1.996294     0
+Very Positive-Negative       4.965353  4.870357  5.060349     0
+Positive-Neutral             1.520258  1.431290  1.609227     0
+Very Negative-Neutral       -4.015658 -4.093402 -3.937914     0
+Very Positive-Neutral        3.020445  2.922850  3.118040     0
+Very Negative-Positive      -5.535916 -5.630749 -5.441083     0
+Very Positive-Positive       1.500186  1.388500  1.611873     0
+Very Positive-Very Negative  7.036103  6.933133  7.139072     0
+
+
+
+
+#barplot to demonstrate
+> means <- tapply(data$Csat.Score, data$Sentiment, mean)
+> barplot(means, 
+        main = "Mean CSAT Score by Sentiment", 
+        xlab = "Sentiment", 
+        ylab = "Mean CSAT Score", 
+        col = "skyblue")
+
+
+#anova to with channel as indpentant variable and Cast as dependant
+     
+>  anova <- aov(Csat.Score ~ Channel, data = data)
+> summary(anova)
+               Df Sum Sq Mean Sq F value Pr(>F)  
+Channel         3     43   14.46   2.573 0.0523 .
+Residuals   12267  68938    5.62                 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+#tukey to test the difference between different channels
+> tukey <- TukeyHSD(anova)
+> summary(tukey)
+        Length Class  Mode   
+Channel 24     -none- numeric
+> tukey <- TukeyHSD(anova)
+> tukey
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = Csat.Score ~ Channel, data = data)
+
+$Channel
+                           diff         lwr        upr     p adj
+Chatbot-Call-Center -0.12083944 -0.26657707 0.02489818 0.1435055
+Email-Call-Center   -0.13158938 -0.28208767 0.01890892 0.1109563
+Web-Call-Center     -0.02158394 -0.17924118 0.13607330 0.9850716
+Email-Chatbot       -0.01074993 -0.16944715 0.14794728 0.9981276
+Web-Chatbot          0.09925551 -0.06624639 0.26475740 0.4129726
+Web-Email            0.11000544 -0.05970360 0.27971447 0.3421377
+
+> plot(tukey)
